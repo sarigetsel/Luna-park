@@ -1,6 +1,14 @@
-const { HebrewCalendar, Location } = require('@hebcal/core');
+let hebcalModule = null;
 
-function isShabbatOrHoliday(date = new Date()) {
+async function loadHebcal() {
+  if (!hebcalModule) {
+    hebcalModule = await import('@hebcal/core');
+  }
+  return hebcalModule;
+}
+
+async function isShabbatOrHoliday(date = new Date()) {
+  const { HebrewCalendar, Location } = await loadHebcal();
   const location = Location.lookup('Jerusalem');
   const events = HebrewCalendar.calendar({
     start: date,
@@ -20,12 +28,20 @@ function isShabbatOrHoliday(date = new Date()) {
 }
 
 function shabbatMiddleware(req, res, next) {
-  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method) && isShabbatOrHoliday()) {
-    return res.status(403).json({
-      message: 'הפעולה אינה זמינה בשבת ובחגים. נסו שוב לאחר צאת השבת/ החג.',
-    });
+  if (!['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    return next();
   }
-  next();
+
+  isShabbatOrHoliday()
+    .then((blocked) => {
+      if (blocked) {
+        return res.status(403).json({
+          message: 'הפעולה אינה זמינה בשבת ובחגים. נסו שוב לאחר צאת השבת/ החג.',
+        });
+      }
+      next();
+    })
+    .catch(next);
 }
 
 module.exports = shabbatMiddleware;
