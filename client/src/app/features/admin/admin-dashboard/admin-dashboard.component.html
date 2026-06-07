@@ -1,0 +1,189 @@
+<div class="page">
+  <h1>לוח ניהול</h1>
+  <p class="subtitle">ניהול מתקנים וקופונים</p>
+
+  <mat-tab-group>
+    <mat-tab label="מתקנים">
+      <div class="tab-content">
+        <mat-card class="form-card">
+          <mat-card-header>
+            <mat-card-title>הוספת מתקן חדש</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="rideForm" (ngSubmit)="addRide()" class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>שם</mat-label>
+                <input matInput formControlName="name" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>תיאור</mat-label>
+                <textarea matInput formControlName="description" rows="2"></textarea>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>קיבולת</mat-label>
+                <input matInput type="number" formControlName="capacity" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>גובה מינימלי (ס״מ)</mat-label>
+                <input matInput type="number" formControlName="minimumHeight" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>קטגוריה</mat-label>
+                <mat-select formControlName="category">
+                  <mat-option value="thrill">ריגושים</mat-option>
+                  <mat-option value="family">משפחה</mat-option>
+                  <mat-option value="kids">ילדים</mat-option>
+                  <mat-option value="water">מים</mat-option>
+                  <mat-option value="show">מופע</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>סטטוס</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="active">פעיל</mat-option>
+                  <mat-option value="maintenance">תחזוקה</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="file-field full">
+                <label>תמונה</label>
+                <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+                @if (imagePreview()) {
+                  <img class="preview" [src]="imagePreview()!" alt="תצוגה מקדימה" />
+                }
+              </div>
+              <div class="file-field full">
+                <label>אודיו (אופציונלי)</label>
+                <input type="file" accept="audio/*" (change)="onAudioSelected($event)" />
+              </div>
+              <button mat-raised-button color="primary" type="submit">הוסף מתקן</button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="table-wrap">
+          <table mat-table [dataSource]="rides()" class="data-table">
+            <ng-container matColumnDef="image">
+              <th mat-header-cell *matHeaderCellDef>תמונה</th>
+              <td mat-cell *matCellDef="let ride">
+                @if (ride.imageUrl) {
+                  <img class="thumb" [src]="mediaUrl(ride.imageUrl)" [alt]="ride.name" />
+                } @else {
+                  —
+                }
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>שם</th>
+              <td mat-cell *matCellDef="let ride">{{ ride.name }}</td>
+            </ng-container>
+            <ng-container matColumnDef="category">
+              <th mat-header-cell *matHeaderCellDef>קטגוריה</th>
+              <td mat-cell *matCellDef="let ride">{{ ride.category }}</td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>סטטוס</th>
+              <td mat-cell *matCellDef="let ride">{{ ride.status }}</td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>פעולות</th>
+              <td mat-cell *matCellDef="let ride">
+                <button mat-button color="warn" type="button" (click)="deleteRide(ride._id)">מחק</button>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="rideColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: rideColumns"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="קופונים">
+      <div class="tab-content">
+        <mat-card class="form-card">
+          <mat-card-header>
+            <mat-card-title>הוספת קופון חדש</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="couponForm" (ngSubmit)="addCoupon()" class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>קוד</mat-label>
+                <input matInput formControlName="code" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>אחוז הנחה</mat-label>
+                <input matInput type="number" formControlName="discountPercent" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>תיאור</mat-label>
+                <input matInput formControlName="description" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>תאריך תפוגה</mat-label>
+                <input matInput type="date" formControlName="expiresAt" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>מגבלת שימוש</mat-label>
+                <input matInput type="number" formControlName="usageLimit" placeholder="ללא הגבלה" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full">
+                <mat-label>קישור לתמונה (URL)</mat-label>
+                <input matInput formControlName="imageUrl" />
+              </mat-form-field>
+              <mat-slide-toggle formControlName="isActive">פעיל</mat-slide-toggle>
+              <button mat-raised-button color="primary" type="submit">הוסף קופון</button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="table-wrap">
+          <table mat-table [dataSource]="coupons()" class="data-table">
+            <ng-container matColumnDef="image">
+              <th mat-header-cell *matHeaderCellDef>תמונה</th>
+              <td mat-cell *matCellDef="let coupon">
+                @if (coupon.imageUrl) {
+                  <img class="thumb" [src]="mediaUrl(coupon.imageUrl)" [alt]="coupon.code" />
+                } @else {
+                  —
+                }
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="code">
+              <th mat-header-cell *matHeaderCellDef>קוד</th>
+              <td mat-cell *matCellDef="let coupon"><strong>{{ coupon.code }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="discount">
+              <th mat-header-cell *matHeaderCellDef>הנחה</th>
+              <td mat-cell *matCellDef="let coupon">{{ coupon.discountPercent }}%</td>
+            </ng-container>
+            <ng-container matColumnDef="expires">
+              <th mat-header-cell *matHeaderCellDef>תפוגה</th>
+              <td mat-cell *matCellDef="let coupon">{{ coupon.expiresAt | date: 'dd/MM/yyyy' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="usage">
+              <th mat-header-cell *matHeaderCellDef>שימושים</th>
+              <td mat-cell *matCellDef="let coupon">
+                {{ coupon.usedCount }}{{ coupon.usageLimit ? ' / ' + coupon.usageLimit : '' }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="active">
+              <th mat-header-cell *matHeaderCellDef>פעיל</th>
+              <td mat-cell *matCellDef="let coupon">
+                <button mat-button type="button" (click)="toggleCoupon(coupon)">
+                  {{ coupon.isActive ? 'כן' : 'לא' }}
+                </button>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>פעולות</th>
+              <td mat-cell *matCellDef="let coupon">
+                <button mat-button color="warn" type="button" (click)="deleteCoupon(coupon._id)">מחק</button>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="couponColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: couponColumns"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
