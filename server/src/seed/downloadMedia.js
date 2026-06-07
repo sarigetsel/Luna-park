@@ -6,8 +6,11 @@ const { uploadDir } = require('../config/env');
 function downloadFile(url, destPath) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(destPath);
+    const options = {
+      headers: { 'User-Agent': 'Luna-park-seed/1.0' },
+    };
     https
-      .get(url, (response) => {
+      .get(url, options, (response) => {
         if (response.statusCode === 301 || response.statusCode === 302) {
           file.close();
           fs.unlinkSync(destPath);
@@ -29,13 +32,13 @@ function downloadFile(url, destPath) {
   });
 }
 
-async function downloadImage(url, filename) {
+async function downloadImage(url, filename, force = false) {
   const imagesDir = path.join(uploadDir, 'images');
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true });
   }
   const dest = path.join(imagesDir, filename);
-  if (fs.existsSync(dest)) {
+  if (fs.existsSync(dest) && !force) {
     return `/uploads/images/${filename}`;
   }
   await downloadFile(url, dest);
