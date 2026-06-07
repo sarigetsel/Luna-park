@@ -20,8 +20,6 @@
     </div>
     @if (auth.isCustomer()) {
       <a mat-flat-button color="primary" class="cta-btn" routerLink="/book">הזמנת כרטיס כניסה</a>
-    } @else {
-      <a mat-flat-button color="primary" class="cta-btn" routerLink="/register">הרשמה והזמנה</a>
     }
   </header>
 
@@ -76,7 +74,7 @@
             </mat-card-actions>
           } @else {
             <mat-card-actions>
-              <a mat-stroked-button routerLink="/register">התחברו כדי להזמין</a>
+              <a mat-stroked-button routerLink="/login">התחברו כדי להזמין</a>
             </mat-card-actions>
           }
         </mat-card>

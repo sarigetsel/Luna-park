@@ -6,8 +6,10 @@ const User = require('../models/User');
 const { adminName, adminEmail, adminPassword, uploadDir } = require('../config/env');
 const { downloadImage } = require('./downloadMedia');
 
-const W = '960px';
+/** Bump when ride image sources change — triggers re-download on next server start. */
+const IMAGE_SEED_VERSION = 3;
 
+/** Real Luna Park Tel Aviv photos from Wikimedia Commons (CC-licensed). */
 const rideSeeds = [
   {
     name: 'גלגל הענק לונה',
@@ -17,7 +19,8 @@ const rideSeeds = [
     category: 'family',
     price: 30,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Clock_-_Ferris_wheel_-_Luna_Park%2C_Sydney.jpg/${W}-Clock_-_Ferris_wheel_-_Luna_Park%2C_Sydney.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/%D7%94%D7%92%D7%9C%D7%92%D7%9C_%D7%94%D7%A2%D7%A0%D7%A7_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%94%D7%92%D7%9C%D7%92%D7%9C_%D7%94%D7%A2%D7%A0%D7%A7_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'ferris-wheel.jpg',
   },
   {
@@ -28,7 +31,8 @@ const rideSeeds = [
     category: 'thrill',
     price: 45,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Roller_Coaster_at_Luna_Park%2C_Melbourne.jpg/${W}-Roller_Coaster_at_Luna_Park%2C_Melbourne.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Anakondacoaster.JPG/960px-Anakondacoaster.JPG',
     imageFile: 'roller-coaster.jpg',
   },
   {
@@ -39,7 +43,8 @@ const rideSeeds = [
     category: 'kids',
     price: 20,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Carousel_-_Luna_Park%2C_Sydney.jpg/${W}-Carousel_-_Luna_Park%2C_Sydney.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%90.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%90.JPG',
     imageFile: 'carousel.jpg',
   },
   {
@@ -50,7 +55,8 @@ const rideSeeds = [
     category: 'water',
     price: 35,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Wet_n_Wild_016.jpg/${W}-Wet_n_Wild_016.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/%D7%94%D7%9E%D7%AA%D7%A7%D7%A0%D7%99%D7%9D_%D7%94%D7%97%D7%93%D7%A9%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7.jpg/960px-%D7%94%D7%9E%D7%AA%D7%A7%D7%A0%D7%99%D7%9D_%D7%94%D7%97%D7%93%D7%A9%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7.jpg',
     imageFile: 'water-slide.jpg',
   },
   {
@@ -61,7 +67,8 @@ const rideSeeds = [
     category: 'thrill',
     price: 40,
     status: 'maintenance',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Disneyland_Park_Paris_-_Phantom_Manor.jpg/${W}-Disneyland_Park_Paris_-_Phantom_Manor.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%A9%D7%93%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%A9%D7%93%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'haunted-house.jpg',
   },
   {
@@ -72,7 +79,8 @@ const rideSeeds = [
     category: 'show',
     price: 15,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Fireworks_over_Disneyland.jpg/${W}-Fireworks_over_Disneyland.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Luna_Park_Tel_Aviv_at_night.jpg/960px-Luna_Park_Tel_Aviv_at_night.jpg',
     imageFile: 'light-show.jpg',
   },
   {
@@ -83,7 +91,8 @@ const rideSeeds = [
     category: 'family',
     price: 28,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Bumper_cars_at_Luna_Park%2C_Sydney.jpg/${W}-Bumper_cars_at_Luna_Park%2C_Sydney.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%904.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%904.JPG',
     imageFile: 'bumper-cars.jpg',
   },
   {
@@ -94,7 +103,8 @@ const rideSeeds = [
     category: 'thrill',
     price: 32,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Log_flume_at_Alton_Towers.jpg/${W}-Log_flume_at_Alton_Towers.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%905.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%905.JPG',
     imageFile: 'pirate-ship.jpg',
   },
   {
@@ -105,7 +115,8 @@ const rideSeeds = [
     category: 'kids',
     price: 22,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Mad_Tea_Party%2C_Magic_Kingdom.jpg/${W}-Mad_Tea_Party%2C_Magic_Kingdom.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%98%D7%90_%D7%92%D7%90_%D7%93%D7%90_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%98%D7%90_%D7%92%D7%90_%D7%93%D7%90_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'teacups.jpg',
   },
   {
@@ -116,7 +127,8 @@ const rideSeeds = [
     category: 'thrill',
     price: 42,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Drop_Tower%2C_Kings_Dominion.jpg/${W}-Drop_Tower%2C_Kings_Dominion.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%9C%D7%90%D7%A7_%D7%9E%D7%9E%D7%91%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%9C%D7%90%D7%A7_%D7%9E%D7%9E%D7%91%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'drop-tower.jpg',
   },
   {
@@ -127,7 +139,8 @@ const rideSeeds = [
     category: 'family',
     price: 30,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Pirates_of_the_Caribbean_at_Disneyland.jpg/${W}-Pirates_of_the_Caribbean_at_Disneyland.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%94%D7%A8%D7%99%D7%9D_%D7%94%D7%9E%D7%A9%D7%A4%D7%97%D7%AA%D7%99%D7%AA_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%94%D7%A8%D7%99%D7%9D_%D7%94%D7%9E%D7%A9%D7%A4%D7%97%D7%AA%D7%99%D7%AA_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'lazy-river.jpg',
   },
   {
@@ -138,7 +151,8 @@ const rideSeeds = [
     category: 'water',
     price: 38,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Wave_pool_at_Wet_n_Wild.jpg/${W}-Wave_pool_at_Wet_n_Wild.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%907.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%907.JPG',
     imageFile: 'wave-pool.jpg',
   },
   {
@@ -149,7 +163,8 @@ const rideSeeds = [
     category: 'thrill',
     price: 36,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Go_kart_racing.jpg/${W}-Go_kart_racing.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%A8%D7%99%D7%99%D7%A7%D7%93%D7%90%D7%A0%D7%A1%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%A8%D7%99%D7%99%D7%A7%D7%93%D7%90%D7%A0%D7%A1%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'go-kart.jpg',
   },
   {
@@ -160,7 +175,8 @@ const rideSeeds = [
     category: 'kids',
     price: 18,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Ball_pit.jpg/${W}-Ball_pit.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/%D7%90%D7%99%D7%96%D7%95%D7%A8_%D7%A2%D7%95%D7%9C%D7%9D_%D7%90%D7%91%D7%A0%D7%99_%D7%94%D7%97%D7%9F_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%90%D7%99%D7%96%D7%95%D7%A8_%D7%A2%D7%95%D7%9C%D7%9D_%D7%90%D7%91%D7%A0%D7%99_%D7%94%D7%97%D7%9F_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'ball-pit.jpg',
   },
   {
@@ -171,7 +187,8 @@ const rideSeeds = [
     category: 'family',
     price: 34,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Space_Mountain_at_Disneyland.jpg/${W}-Space_Mountain_at_Disneyland.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%99%D7%A0%D7%9E%D7%94_%D7%9C%D7%95%D7%A0%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%99%D7%A0%D7%9E%D7%94_%D7%9C%D7%95%D7%A0%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'space-ride.jpg',
   },
   {
@@ -182,7 +199,8 @@ const rideSeeds = [
     category: 'thrill',
     price: 25,
     status: 'active',
-    imageSource: `https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/CN_Tower_edge_walk.jpg/${W}-CN_Tower_edge_walk.jpg`,
+    imageSource:
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%98%D7%90%D7%A8_%D7%A4%D7%9C%D7%99%D7%99%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%98%D7%90%D7%A8_%D7%A4%D7%9C%D7%99%D7%99%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
     imageFile: 'glass-bridge.jpg',
   },
 ];
@@ -214,18 +232,43 @@ async function resolveRideImage(seed, imagesDir) {
   return `/uploads/images/${seed.imageFile}`;
 }
 
+function getStoredImageVersion(imagesDir) {
+  const versionFile = path.join(imagesDir, '.ride-images-version');
+  if (!fs.existsSync(versionFile)) {
+    return 0;
+  }
+  const parsed = parseInt(fs.readFileSync(versionFile, 'utf8'), 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function markImageVersion(imagesDir) {
+  const versionFile = path.join(imagesDir, '.ride-images-version');
+  fs.writeFileSync(versionFile, String(IMAGE_SEED_VERSION));
+}
+
 async function backfillRideImages() {
   const imagesDir = path.join(uploadDir, 'images');
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true });
   }
 
+  const forceRefresh = getStoredImageVersion(imagesDir) < IMAGE_SEED_VERSION;
+  let refreshFailures = 0;
+  if (forceRefresh) {
+    console.log(`Refreshing ride images to version ${IMAGE_SEED_VERSION} (Luna Park Tel Aviv)`);
+  }
+
   for (const seed of rideSeeds) {
     const ride = await Ride.findOne({ name: seed.name });
-    const fileMissing = !fs.existsSync(path.join(imagesDir, seed.imageFile));
+    const dest = path.join(imagesDir, seed.imageFile);
+    const fileMissing = !fs.existsSync(dest);
 
-    if (!fileMissing && ride?.imageUrl) {
+    if (!forceRefresh && !fileMissing && ride?.imageUrl) {
       continue;
+    }
+
+    if (forceRefresh && fs.existsSync(dest)) {
+      fs.unlinkSync(dest);
     }
 
     try {
@@ -234,12 +277,17 @@ async function backfillRideImages() {
         ride.imageUrl = imageUrl;
         await ride.save();
       }
-      if (fileMissing) {
+      if (fileMissing || forceRefresh) {
         console.log(`Backfilled ride image: ${seed.imageFile}`);
       }
     } catch (err) {
+      refreshFailures += 1;
       console.warn(`Could not backfill image for ${seed.name}:`, err.message);
     }
+  }
+
+  if (forceRefresh && refreshFailures === 0) {
+    markImageVersion(imagesDir);
   }
 }
 

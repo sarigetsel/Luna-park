@@ -30,11 +30,6 @@
               <mat-icon>confirmation_number</mat-icon>
               הזמנת כרטיס
             </a>
-          } @else {
-            <a mat-flat-button color="primary" routerLink="/register" class="hero-btn">
-              <mat-icon>person_add</mat-icon>
-              הרשמה והזמנה
-            </a>
           }
           <a mat-stroked-button routerLink="/rides" class="hero-btn secondary">
             <mat-icon>explore</mat-icon>
@@ -45,10 +40,6 @@
           <div class="stat">
             <strong>16+</strong>
             <span>מתקנים</span>
-          </div>
-          <div class="stat">
-            <strong>4.8</strong>
-            <span>דירוג מבקרים</span>
           </div>
           <div class="stat">
             <strong>09–22</strong>
@@ -137,8 +128,6 @@
       <div class="bottom-actions">
         @if (auth.isCustomer()) {
           <a mat-flat-button color="primary" routerLink="/book">הזמנת כרטיס כניסה</a>
-        } @else {
-          <a mat-flat-button color="primary" routerLink="/register">הרשמה עכשיו</a>
         }
         <a mat-stroked-button routerLink="/rides">צפייה במתקנים</a>
       </div>

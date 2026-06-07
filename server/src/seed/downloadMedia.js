@@ -3,19 +3,35 @@ const path = require('path');
 const https = require('https');
 const { uploadDir } = require('../config/env');
 
+const WIKIMEDIA_USER_AGENT =
+  'LunaParkProject/1.0 (educational; https://github.com/avigailrapa/Luna-park)';
+
 function downloadFile(url, destPath) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(destPath);
+    const requestUrl = new URL(url);
+    const options = {
+      hostname: requestUrl.hostname,
+      path: `${requestUrl.pathname}${requestUrl.search}`,
+      headers: {
+        'User-Agent': WIKIMEDIA_USER_AGENT,
+        Accept: 'image/*,*/*;q=0.8',
+      },
+    };
+
     https
-      .get(url, (response) => {
+      .get(options, (response) => {
         if (response.statusCode === 301 || response.statusCode === 302) {
           file.close();
-          fs.unlinkSync(destPath);
-          return downloadFile(response.headers.location, destPath).then(resolve).catch(reject);
+          if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+          const nextUrl = response.headers.location.startsWith('http')
+            ? response.headers.location
+            : `https://${requestUrl.hostname}${response.headers.location}`;
+          return downloadFile(nextUrl, destPath).then(resolve).catch(reject);
         }
         if (response.statusCode !== 200) {
           file.close();
-          fs.unlinkSync(destPath);
+          if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
           return reject(new Error(`Download failed: ${response.statusCode}`));
         }
         response.pipe(file);
@@ -35,8 +51,11 @@ async function downloadImage(url, filename) {
     fs.mkdirSync(imagesDir, { recursive: true });
   }
   const dest = path.join(imagesDir, filename);
-  if (fs.existsSync(dest)) {
+  if (fs.existsSync(dest) && fs.statSync(dest).size > 0) {
     return `/uploads/images/${filename}`;
+  }
+  if (fs.existsSync(dest)) {
+    fs.unlinkSync(dest);
   }
   try {
     await downloadFile(url, dest);
