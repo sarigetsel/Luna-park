@@ -1,0 +1,90 @@
+<div class="page">
+  <header class="page-header">
+    <h1>מתקנים</h1>
+    <p>גלו את כל המתקנים ב-Luna Park</p>
+    @if (auth.isCustomer()) {
+      <a mat-raised-button color="primary" routerLink="/book">הזמנת כרטיס</a>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="center">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else {
+    <div class="cards">
+      @for (ride of rides(); track ride._id) {
+        <mat-card class="ride-card" [class.maintenance]="ride.status === 'maintenance'">
+          <div class="image-wrap">
+            <img [src]="mediaUrl(ride.imageUrl)" [alt]="ride.name" loading="lazy" />
+            @if (ride.status === 'maintenance') {
+              <span class="badge maintenance-badge">בתחזוקה</span>
+            }
+          </div>
+          <mat-card-header>
+            <mat-card-title>{{ ride.name }}</mat-card-title>
+            <mat-card-subtitle>{{ categoryLabel(ride.category) }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ ride.description }}</p>
+            <ul class="meta">
+              <li>קיבולת: {{ ride.capacity }}</li>
+              <li>גובה מינימלי: {{ ride.minimumHeight }} ס״מ</li>
+            </ul>
+            @if (ride.audioUrl) {
+              <audio controls [src]="mediaUrl(ride.audioUrl)" class="ride-audio"></audio>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <section class="table-section">
+      <h2>טבלת מתקנים</h2>
+      <div class="table-wrap">
+        <table mat-table [dataSource]="rides()" class="rides-table">
+          <ng-container matColumnDef="image">
+            <th mat-header-cell *matHeaderCellDef>תמונה</th>
+            <td mat-cell *matCellDef="let ride">
+              <img class="thumb" [src]="mediaUrl(ride.imageUrl)" [alt]="ride.name" loading="lazy" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>שם</th>
+            <td mat-cell *matCellDef="let ride">{{ ride.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>קטגוריה</th>
+            <td mat-cell *matCellDef="let ride">{{ categoryLabel(ride.category) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="capacity">
+            <th mat-header-cell *matHeaderCellDef>קיבולת</th>
+            <td mat-cell *matCellDef="let ride">{{ ride.capacity }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="minHeight">
+            <th mat-header-cell *matHeaderCellDef>גובה מינ׳</th>
+            <td mat-cell *matCellDef="let ride">{{ ride.minimumHeight }} ס״מ</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>סטטוס</th>
+            <td mat-cell *matCellDef="let ride">
+              <span [class]="ride.status === 'active' ? 'status-active' : 'status-maint'">
+                {{ ride.status === 'active' ? 'פעיל' : 'תחזוקה' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+    </section>
+  }
+</div>
