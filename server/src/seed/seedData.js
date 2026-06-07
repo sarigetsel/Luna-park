@@ -118,29 +118,32 @@ const couponSeeds = [
 ];
 
 async function seedAdmin() {
-  if (!adminEmail || !adminPassword) {
+  const email = adminEmail?.toLowerCase().trim() || '';
+  const password = adminPassword?.trim() || '';
+
+  if (!email || !password) {
     console.log('Admin seed skipped (set ADMIN_EMAIL and ADMIN_PASSWORD in .env)');
     return;
   }
 
-  const email = adminEmail.toLowerCase().trim();
   const existing = await User.findOne({ email });
 
   if (existing) {
-    if (existing.role !== 'admin') {
-      existing.role = 'admin';
-      await existing.save();
-      console.log(`Upgraded ${email} to admin`);
-    } else {
+    if (existing.role === 'admin') {
       console.log(`Admin user already exists (${email})`);
+      return;
     }
+    console.warn(
+      `Admin seed skipped: ${email} is already registered as a customer. ` +
+        'Use a dedicated admin email or remove the existing user manually.'
+    );
     return;
   }
 
   await User.create({
     name: adminName,
     email,
-    password: adminPassword,
+    password,
     role: 'admin',
   });
   console.log(`Seeded admin user: ${email}`);

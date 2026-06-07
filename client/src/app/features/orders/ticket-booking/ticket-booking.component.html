@@ -2,11 +2,13 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>הזמנת כרטיס כניסה</mat-card-title>
-      <mat-card-subtitle>בחרו תאריך ביקור וסוג כרטיס</mat-card-subtitle>
+      <mat-card-subtitle>בחרו תאריך, סוג כרטיס ושלמו</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="submit()">
+        <h3 class="section-title">1. פרטי כרטיס</h3>
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>תאריך ביקור</mat-label>
           <input matInput [matDatepicker]="picker" formControlName="chosenDate" />
@@ -68,9 +70,80 @@
           }
         </div>
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
-          {{ loading() ? 'מזמין...' : 'השלמת הזמנה' }}
+        <mat-divider></mat-divider>
+
+        <h3 class="section-title">2. תשלום (דמו)</h3>
+        <p class="demo-hint">הזינו כל מספר כרטיס בן 16 ספרות, תוקף MM/YY ו-CVV בן 3 ספרות</p>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>שם על הכרטיס</mat-label>
+          <input matInput formControlName="cardName" autocomplete="cc-name" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>מספר כרטיס</mat-label>
+          <input
+            matInput
+            formControlName="cardNumber"
+            inputmode="numeric"
+            maxlength="16"
+            placeholder="4242424242424242"
+            (input)="formatCardNumber($any($event.target).value)"
+            autocomplete="cc-number"
+          />
+          <mat-icon matSuffix>credit_card</mat-icon>
+        </mat-form-field>
+
+        <div class="card-row">
+          <mat-form-field appearance="outline">
+            <mat-label>תוקף (MM/YY)</mat-label>
+            <input
+              matInput
+              formControlName="expiry"
+              placeholder="12/28"
+              maxlength="5"
+              (input)="formatExpiry($any($event.target).value)"
+              autocomplete="cc-exp"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>CVV</mat-label>
+            <input
+              matInput
+              formControlName="cvv"
+              type="password"
+              maxlength="3"
+              inputmode="numeric"
+              autocomplete="cc-csc"
+            />
+          </mat-form-field>
+        </div>
+
+        <div class="pay-summary">
+          <span>לתשלום</span>
+          <strong>₪{{ finalPrice() }}</strong>
+        </div>
+
+        <button mat-flat-button color="primary" type="submit" class="pay-btn" [disabled]="paying()">
+          @if (paying()) {
+            @if (paymentDone()) {
+              שולח אישור לאימייל...
+            } @else {
+              מעבד תשלום...
+            }
+          } @else {
+            <mat-icon>lock</mat-icon>
+            שלם ₪{{ finalPrice() }}
+          }
         </button>
+
+        @if (paying()) {
+          <div class="processing">
+            <mat-spinner diameter="32"></mat-spinner>
+            <span>תשלום דמו בתהליך...</span>
+          </div>
+        }
       </form>
     </mat-card-content>
   </mat-card>

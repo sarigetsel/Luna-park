@@ -8,8 +8,24 @@ import { CreateOrderDto, Order } from '../models/order.model';
 export class OrderService {
   private readonly http = inject(HttpClient);
 
-  createOrder(data: CreateOrderDto): Observable<{ order: Order }> {
-    return this.http.post<{ order: Order }>(`${environment.apiUrl}/orders`, data);
+  createOrder(data: CreateOrderDto): Observable<{
+    order: Order;
+    message?: string;
+    emailSent?: boolean;
+    emailHint?: string;
+  }> {
+    return this.http.post<{
+      order: Order;
+      message?: string;
+      emailSent?: boolean;
+      emailHint?: string;
+    }>(`${environment.apiUrl}/orders`, data);
+  }
+
+  getOrderBarcode(orderId: string) {
+    return this.http.get(`${environment.apiUrl}/orders/my-orders/${orderId}/barcode`, {
+      responseType: 'blob',
+    });
   }
 
   getMyOrders(): Observable<{ orders: Order[] }> {

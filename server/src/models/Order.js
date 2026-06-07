@@ -14,6 +14,7 @@ const orderSchema = new mongoose.Schema(
     totalPrice: { type: Number, required: true },
     discountApplied: { type: Number, default: 0 },
     finalPrice: { type: Number, required: true },
+    ticketCode: { type: String, unique: true, sparse: true },
     status: {
       type: String,
       enum: ['pending', 'confirmed', 'cancelled'],

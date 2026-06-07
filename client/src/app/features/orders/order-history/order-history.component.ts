@@ -5,8 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { OrderService } from '../../../core/services/order.service';
 import { Order, RideRef } from '../../../core/models/order.model';
+import { TicketBarcodeDialogComponent } from '../ticket-barcode-dialog/ticket-barcode-dialog.component';
 
 @Component({
   selector: 'app-order-history',
@@ -17,6 +21,8 @@ import { Order, RideRef } from '../../../core/models/order.model';
     MatTableModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatButtonModule,
+    MatIconModule,
   ],
   templateUrl: './order-history.component.html',
   styleUrl: './order-history.component.scss',
@@ -24,10 +30,12 @@ import { Order, RideRef } from '../../../core/models/order.model';
 export class OrderHistoryComponent implements OnInit {
   private readonly orderService = inject(OrderService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly loading = signal(true);
   protected readonly orders = signal<Order[]>([]);
   protected readonly displayedColumns = [
+    'ticketCode',
     'chosenDate',
     'ticketType',
     'ride',
@@ -36,6 +44,7 @@ export class OrderHistoryComponent implements OnInit {
     'discount',
     'finalPrice',
     'status',
+    'actions',
   ];
 
   ngOnInit(): void {
@@ -74,6 +83,17 @@ export class OrderHistoryComponent implements OnInit {
       cancelled: 'בוטל',
     };
     return labels[status] ?? status;
+  }
+
+  showBarcode(order: Order): void {
+    if (!order.ticketCode) {
+      this.snackBar.open('אין ברקוד להזמנה זו', 'סגור', { duration: 3000 });
+      return;
+    }
+    this.dialog.open(TicketBarcodeDialogComponent, {
+      data: order,
+      width: '360px',
+    });
   }
 
   rideName(ride: Order['rideId']): string {

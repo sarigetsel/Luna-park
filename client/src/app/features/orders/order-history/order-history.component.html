@@ -14,6 +14,13 @@
         <p class="empty">אין הזמנות עדיין. <a routerLink="/book">הזמינו כרטיס ראשון</a>.</p>
       } @else {
         <table mat-table [dataSource]="orders()" class="orders-table">
+          <ng-container matColumnDef="ticketCode">
+            <th mat-header-cell *matHeaderCellDef>קוד כרטיס</th>
+            <td mat-cell *matCellDef="let o">
+              <code>{{ o.ticketCode || '—' }}</code>
+            </td>
+          </ng-container>
+
           <ng-container matColumnDef="chosenDate">
             <th mat-header-cell *matHeaderCellDef>תאריך ביקור</th>
             <td mat-cell *matCellDef="let o">{{ o.chosenDate | date: 'dd/MM/yyyy' }}</td>
@@ -60,6 +67,20 @@
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>סטטוס</th>
             <td mat-cell *matCellDef="let o">{{ statusLabel(o.status) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>ברקוד</th>
+            <td mat-cell *matCellDef="let o">
+              @if (o.ticketCode) {
+                <button mat-stroked-button type="button" (click)="showBarcode(o)">
+                  <mat-icon>qr_code</mat-icon>
+                  הצג
+                </button>
+              } @else {
+                —
+              }
+            </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

@@ -10,6 +10,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { OrderService } from '../../../core/services/order.service';
 import { CouponService } from '../../../core/services/coupon.service';
@@ -31,6 +33,8 @@ const PARK_CLOSE_HOUR = 22;
     MatButtonModule,
     MatDatepickerModule,
     MatIconModule,
+    MatDividerModule,
+    MatProgressSpinnerModule,
     MatSnackBarModule,
   ],
   templateUrl: './ticket-booking.component.html',
@@ -43,7 +47,8 @@ export class TicketBookingComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
 
-  protected readonly loading = signal(false);
+  protected readonly paying = signal(false);
+  protected readonly paymentDone = signal(false);
   protected readonly discountPercent = signal<number | null>(null);
   protected readonly couponMessage = signal<string | null>(null);
   protected readonly PARK_OPEN_HOUR = PARK_OPEN_HOUR;
@@ -59,6 +64,10 @@ export class TicketBookingComponent implements OnInit {
     startHour: [PARK_OPEN_HOUR],
     endHour: [12],
     couponCode: [''],
+    cardName: ['', [Validators.required, Validators.minLength(2)]],
+    cardNumber: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
+    expiry: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]],
+    cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]],
   });
 
   protected readonly ticketType = toSignal(this.form.controls.ticketType.valueChanges, {
@@ -117,6 +126,17 @@ export class TicketBookingComponent implements OnInit {
     return `${String(hour).padStart(2, '0')}:00`;
   }
 
+  protected formatCardNumber(value: string): void {
+    const digits = value.replace(/\D/g, '').slice(0, 16);
+    this.form.controls.cardNumber.setValue(digits, { emitEvent: false });
+  }
+
+  protected formatExpiry(value: string): void {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    const formatted = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+    this.form.controls.expiry.setValue(formatted, { emitEvent: false });
+  }
+
   applyCoupon(): void {
     const code = this.form.controls.couponCode.value.trim();
     if (!code) {
@@ -159,26 +179,36 @@ export class TicketBookingComponent implements OnInit {
       return;
     }
 
-    this.loading.set(true);
-    this.orderService
-      .createOrder({
-        ticketType: raw.ticketType,
-        chosenDate: chosenDate.toISOString(),
-        startHour: raw.ticketType === 'hourly' ? raw.startHour : undefined,
-        endHour: raw.ticketType === 'hourly' ? raw.endHour : undefined,
-        couponCode: raw.couponCode.trim() || undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.snackBar.open('הכרטיס הוזמן בהצלחה!', 'סגור', { duration: 3000 });
-          this.router.navigate(['/my-orders']);
-        },
-        error: (err) => {
-          this.loading.set(false);
-          const message = err.error?.message || 'ההזמנה נכשלה';
-          this.snackBar.open(message, 'סגור', { duration: 5000 });
-        },
-        complete: () => this.loading.set(false),
-      });
+    this.paying.set(true);
+    this.paymentDone.set(false);
+
+    setTimeout(() => {
+      this.paymentDone.set(true);
+      this.orderService
+        .createOrder({
+          ticketType: raw.ticketType,
+          chosenDate: chosenDate.toISOString(),
+          startHour: raw.ticketType === 'hourly' ? raw.startHour : undefined,
+          endHour: raw.ticketType === 'hourly' ? raw.endHour : undefined,
+          couponCode: raw.couponCode.trim() || undefined,
+        })
+        .subscribe({
+          next: (res) => {
+            this.paying.set(false);
+            let msg = res.message || 'ההזמנה בוצעה בהצלחה';
+            if (!res.emailSent) {
+              msg += ' — לחצי "הצג ברקוד" בהזמנות שלי.';
+            }
+            this.snackBar.open(msg, 'סגור', { duration: 7000 });
+            this.router.navigate(['/my-orders']);
+          },
+          error: (err) => {
+            this.paying.set(false);
+            this.paymentDone.set(false);
+            const message = err.error?.message || 'ההזמנה נכשלה';
+            this.snackBar.open(message, 'סגור', { duration: 5000 });
+          },
+        });
+    }, 1500);
   }
 }

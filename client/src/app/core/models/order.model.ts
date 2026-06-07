@@ -14,6 +14,7 @@ export interface Order {
   startHour?: number | null;
   endHour?: number | null;
   couponCode?: string | null;
+  ticketCode?: string;
   totalPrice: number;
   discountApplied: number;
   finalPrice: number;

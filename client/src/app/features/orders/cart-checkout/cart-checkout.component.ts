@@ -97,9 +97,11 @@ export class CartCheckoutComponent implements OnInit {
         next: () => {
           this.cart.clear();
           this.paying.set(false);
-          this.snackBar.open('התשלום בוצע והמתקנים הוזמנו בהצלחה!', 'סגור', {
-            duration: 4000,
-          });
+          this.snackBar.open(
+            'התשלום בוצע! אישורים עם ברקוד נשלחו לאימייל שלך.',
+            'סגור',
+            { duration: 5000 }
+          );
           this.router.navigate(['/my-orders']);
         },
         error: (err) => {
