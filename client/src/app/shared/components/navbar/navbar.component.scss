@@ -1,24 +1,119 @@
 .navbar {
-  gap: 0.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 72px;
+  padding: 0 1.5rem;
+  background: rgba(10, 6, 18, 0.92) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--luna-border);
+  color: var(--luna-text) !important;
+  gap: 0.5rem;
+
+  &--home {
+    background: rgba(10, 6, 18, 0.6) !important;
+    border-bottom-color: transparent;
+  }
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: inherit;
-  font-weight: 600;
   text-decoration: none;
-  margin-right: 1rem;
+  margin-left: 0.5rem;
+
+  .brand-icon {
+    color: var(--luna-gold);
+    filter: drop-shadow(0 0 8px var(--luna-gold));
+  }
+
+  .brand-text {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-accent {
+    background: var(--luna-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .spacer {
   flex: 1;
 }
 
-.user-label {
-  margin: 0 0.5rem;
-  opacity: 0.9;
-  font-size: 0.875rem;
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+
+  a {
+    color: var(--luna-text-muted) !important;
+    border-radius: 999px !important;
+    font-size: 0.9rem !important;
+
+    mat-icon {
+      font-size: 1.1rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      margin-left: 0.35rem;
+    }
+
+    &.active {
+      color: var(--luna-gold) !important;
+      background: rgba(255, 200, 87, 0.1) !important;
+      font-weight: 600;
+    }
+  }
 }
 
-a.active {
-  font-weight: 600;
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+
+  .user-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--luna-text-muted);
+
+    mat-icon {
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  .btn-logout {
+    border-color: var(--luna-border) !important;
+    color: var(--luna-text-muted) !important;
+    border-radius: 999px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .btn-register {
+    background: var(--luna-gradient) !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    font-weight: 600 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-links a span:not(mat-icon),
+  .user-label {
+    display: none;
+  }
+
+  .navbar {
+    padding: 0 0.75rem;
+  }
 }

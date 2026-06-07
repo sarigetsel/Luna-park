@@ -1,23 +1,51 @@
-<mat-toolbar color="primary" class="navbar">
-  <a routerLink="/rides" class="brand">Luna-park</a>
+<mat-toolbar class="navbar" [class.navbar--home]="isHome()">
+  <a routerLink="/" class="brand">
+    <mat-icon class="brand-icon">brightness_3</mat-icon>
+    <span class="brand-text">Luna<span class="brand-accent">Park</span></span>
+  </a>
   <span class="spacer"></span>
 
-  <a mat-button routerLink="/rides" routerLinkActive="active">Rides</a>
+  <nav class="nav-links">
+    <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <mat-icon>home</mat-icon>
+      בית
+    </a>
+    <a mat-button routerLink="/rides" routerLinkActive="active">
+      <mat-icon>attractions</mat-icon>
+      מתקנים
+    </a>
 
-  @if (auth.isCustomer()) {
-    <a mat-button routerLink="/book" routerLinkActive="active">Book Ticket</a>
-    <a mat-button routerLink="/my-orders" routerLinkActive="active">My Orders</a>
-  }
+    @if (auth.isCustomer()) {
+      <a mat-button routerLink="/book" routerLinkActive="active">
+        <mat-icon>confirmation_number</mat-icon>
+        הזמנה
+      </a>
+      <a mat-button routerLink="/my-orders" routerLinkActive="active">
+        <mat-icon>receipt_long</mat-icon>
+        ההזמנות שלי
+      </a>
+    }
 
-  @if (auth.isAdmin()) {
-    <a mat-button routerLink="/admin" routerLinkActive="active">Admin</a>
-  }
+    @if (auth.isAdmin()) {
+      <a mat-button routerLink="/admin" routerLinkActive="active">
+        <mat-icon>admin_panel_settings</mat-icon>
+        ניהול
+      </a>
+    }
+  </nav>
 
-  @if (auth.isAuthenticated()) {
-    <span class="user-label">{{ auth.user()?.name }}</span>
-    <button mat-button type="button" (click)="auth.logout()">Logout</button>
-  } @else {
-    <a mat-button routerLink="/login" routerLinkActive="active">Login</a>
-    <a mat-button routerLink="/register" routerLinkActive="active">Register</a>
-  }
+  <div class="nav-auth">
+    @if (auth.isAuthenticated()) {
+      <span class="user-label">
+        <mat-icon>person</mat-icon>
+        {{ auth.user()?.name }}
+      </span>
+      <button mat-stroked-button type="button" class="btn-logout" (click)="auth.logout()">
+        יציאה
+      </button>
+    } @else {
+      <a mat-button routerLink="/login" routerLinkActive="active">התחברות</a>
+      <a mat-flat-button class="btn-register" routerLink="/register">הרשמה</a>
+    }
+  </div>
 </mat-toolbar>

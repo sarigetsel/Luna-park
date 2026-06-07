@@ -1,0 +1,100 @@
+<section class="hero">
+  <div class="hero-slides">
+    @for (slide of slides; track slide.image; let i = $index) {
+      <div
+        class="hero-slide"
+        [class.active]="activeSlide() === i"
+        [style.background-image]="'url(' + slide.image + ')'"
+      >
+        <div class="hero-slide-overlay"></div>
+      </div>
+    }
+  </div>
+
+  <div class="hero-particles">
+    @for (p of [1,2,3,4,5,6,7,8,9,10,11,12]; track p) {
+      <span class="particle" [style.--i]="p"></span>
+    }
+  </div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">ברוכים הבאים ל</p>
+    <h1 class="hero-title">
+      <span class="title-luna">Luna</span>
+      <span class="title-park">Park</span>
+    </h1>
+    <p class="hero-tagline">
+      {{ slides[activeSlide()].subtitle }}
+    </p>
+
+    <div class="hero-actions">
+      <a mat-flat-button class="btn-primary" routerLink="/rides">
+        <mat-icon>attractions</mat-icon>
+        גלו את המתקנים
+      </a>
+      @if (auth.isCustomer()) {
+        <a mat-stroked-button class="btn-secondary" routerLink="/book">
+          <mat-icon>confirmation_number</mat-icon>
+          הזמינו כרטיס
+        </a>
+      } @else if (!auth.isAuthenticated()) {
+        <a mat-stroked-button class="btn-secondary" routerLink="/register">
+          <mat-icon>person_add</mat-icon>
+          הצטרפו עכשיו
+        </a>
+      }
+    </div>
+
+    <div class="hero-dots">
+      @for (slide of slides; track slide.image; let i = $index) {
+        <button
+          type="button"
+          class="dot"
+          [class.active]="activeSlide() === i"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'שקף ' + (i + 1)"
+        ></button>
+      }
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <mat-icon>expand_more</mat-icon>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-inner">
+    <h2>למה Luna Park?</h2>
+    <div class="feature-grid">
+      <article class="feature-card">
+        <mat-icon>roller_coaster</mat-icon>
+        <h3>מתקנים מרהיבים</h3>
+        <p>רכבות הרים, גלגל ענק, מגלשות מים ועוד — לכל הגילאים.</p>
+      </article>
+      <article class="feature-card">
+        <mat-icon>nightlife</mat-icon>
+        <h3>חוויית לילה</h3>
+        <p>אורות ניאון, מופעים חיים ואווירת קרנבל קסומה.</p>
+      </article>
+      <article class="feature-card">
+        <mat-icon>local_offer</mat-icon>
+        <h3>קופונים והנחות</h3>
+        <p>חסכו על כרטיסים עם קודי קופון בלעדיים.</p>
+      </article>
+      <article class="feature-card">
+        <mat-icon>family_restroom</mat-icon>
+        <h3>כיף למשפחה</h3>
+        <p>מתקני ילדים, משפחה וריגושים — הכל במקום אחד.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="cta-banner">
+  <div class="cta-inner">
+    <h2>מוכנים להרפתקה?</h2>
+    <p>גלו את כל המתקנים, בחרו את האהוב עליכם והזמינו כרטיס.</p>
+    <a mat-flat-button class="btn-cta" routerLink="/rides">לקטלוג המתקנים</a>
+  </div>
+</section>

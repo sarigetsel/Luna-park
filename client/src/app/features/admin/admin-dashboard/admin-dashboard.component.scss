@@ -1,16 +1,5 @@
-.page {
+.admin-page {
   max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-h1 {
-  margin: 0 0 0.25rem;
-}
-
-.subtitle {
-  margin: 0 0 1.5rem;
-  color: #666;
 }
 
 .tab-content {
@@ -26,6 +15,12 @@ h1 {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 0.75rem 1rem;
   align-items: start;
+
+  button[type='submit'] {
+    background: var(--luna-gradient) !important;
+    border-radius: 999px !important;
+    font-weight: 600 !important;
+  }
 }
 
 .form-grid .full {
@@ -36,25 +31,32 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
 
-.file-field label {
-  font-size: 0.875rem;
-  color: #666;
+  label {
+    font-size: 0.875rem;
+    color: var(--luna-text-muted);
+  }
+
+  input[type='file'] {
+    color: var(--luna-text-muted);
+    font-size: 0.85rem;
+  }
 }
 
 .preview {
-  max-width: 200px;
-  max-height: 120px;
+  max-width: 220px;
+  max-height: 130px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: var(--luna-radius-sm);
+  border: 2px solid var(--luna-border);
 }
 
 .table-wrap {
   overflow-x: auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--luna-card);
+  border: 1px solid var(--luna-border);
+  border-radius: var(--luna-radius);
+  box-shadow: var(--luna-shadow);
 }
 
 .data-table {
@@ -62,8 +64,9 @@ h1 {
 }
 
 .thumb {
-  width: 56px;
-  height: 42px;
+  width: 60px;
+  height: 44px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: var(--luna-radius-sm);
+  border: 2px solid var(--luna-border);
 }

@@ -1,21 +1,41 @@
-.page {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
 .loading {
   display: flex;
   justify-content: center;
-  padding: 2rem;
+  padding: 3rem;
 }
 
 .empty {
   text-align: center;
-  padding: 2rem;
-  color: #666;
+  padding: 3rem 1rem;
+
+  p {
+    color: var(--luna-text-muted);
+    margin: 0 0 1.5rem;
+  }
+
+  .book-link {
+    background: var(--luna-gradient) !important;
+    border-radius: 999px !important;
+  }
+}
+
+.table-wrap {
+  overflow-x: auto;
 }
 
 .orders-table {
   width: 100%;
+}
+
+.price {
+  color: var(--luna-gold);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: rgba(105, 240, 174, 0.15);
+  color: #69f0ae;
 }

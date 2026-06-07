@@ -1,38 +1,38 @@
-<div class="page">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Book a Ticket</mat-card-title>
-      <mat-card-subtitle>Choose your visit date and ticket type</mat-card-subtitle>
-    </mat-card-header>
+<div class="luna-page booking-page">
+  <header class="luna-page-header">
+    <h1>הזמנת כרטיס</h1>
+    <p>בחרו תאריך, סוג כרטיס ומתקן — וקבלו מחיר מיידי</p>
+  </header>
 
+  <mat-card class="booking-card">
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="submit()">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Visit date</mat-label>
+          <mat-label>תאריך ביקור</mat-label>
           <input matInput [matDatepicker]="picker" formControlName="chosenDate" />
           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
 
         <div class="ticket-type">
-          <label>Ticket type</label>
+          <label>סוג כרטיס</label>
           <mat-radio-group formControlName="ticketType">
-            <mat-radio-button value="full_day">Full Day ($50)</mat-radio-button>
-            <mat-radio-button value="hourly">Hourly ($15/hour)</mat-radio-button>
+            <mat-radio-button value="full_day">יום שלם ($50)</mat-radio-button>
+            <mat-radio-button value="hourly">לפי שעה ($15/שעה)</mat-radio-button>
           </mat-radio-group>
         </div>
 
         @if (isHourly()) {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Hours</mat-label>
+            <mat-label>מספר שעות</mat-label>
             <input matInput type="number" min="1" formControlName="hoursAmount" />
           </mat-form-field>
         }
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Preferred ride (optional)</mat-label>
+          <mat-label>מתקן מועדף (אופציונלי)</mat-label>
           <mat-select formControlName="rideId">
-            <mat-option value="">None</mat-option>
+            <mat-option value="">ללא</mat-option>
             @for (ride of rideList(); track ride._id) {
               <mat-option [value]="ride._id">{{ ride.name }}</mat-option>
             }
@@ -41,27 +41,34 @@
 
         <div class="coupon-row">
           <mat-form-field appearance="outline" class="coupon-field">
-            <mat-label>Coupon code (optional)</mat-label>
+            <mat-label>קוד קופון (אופציונלי)</mat-label>
             <input matInput formControlName="couponCode" />
           </mat-form-field>
-          <button mat-stroked-button type="button" (click)="applyCoupon()">Apply</button>
+          <button mat-stroked-button type="button" class="apply-btn" (click)="applyCoupon()">החלה</button>
         </div>
         @if (couponMessage()) {
           <p class="coupon-msg">{{ couponMessage() }}</p>
         }
 
         <div class="price-summary">
-          <p>Base price: <strong>${{ basePrice() }}</strong></p>
+          <div class="price-row">
+            <span>מחיר בסיס</span>
+            <strong>${{ basePrice() }}</strong>
+          </div>
           @if (discountApplied() > 0) {
-            <p class="discount">Discount: -${{ discountApplied() }}</p>
-            <p class="final">Final price: <strong>${{ finalPrice() }}</strong></p>
-          } @else {
-            <p>Total: <strong>${{ finalPrice() }}</strong></p>
+            <div class="price-row discount">
+              <span>הנחה</span>
+              <strong>-${{ discountApplied() }}</strong>
+            </div>
           }
+          <div class="price-row total">
+            <span>סה״כ לתשלום</span>
+            <strong>${{ finalPrice() }}</strong>
+          </div>
         </div>
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
-          {{ loading() ? 'Booking...' : 'Complete Booking' }}
+        <button mat-flat-button class="submit-btn" type="submit" [disabled]="loading()">
+          {{ loading() ? 'מבצע הזמנה...' : 'אישור הזמנה' }}
         </button>
       </form>
     </mat-card-content>

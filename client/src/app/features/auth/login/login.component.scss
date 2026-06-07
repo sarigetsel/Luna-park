@@ -1,10 +1,78 @@
 .auth-page {
-  display: flex;
-  justify-content: center;
-  padding: 2rem 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 72px);
 }
 
-mat-card {
+.auth-visual {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.visual-slides {
+  position: absolute;
+  inset: 0;
+}
+
+.visual-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  animation: authSlide 15s infinite;
+
+  &.s1 {
+    background-image: url('https://images.unsplash.com/photo-1596436889104-947806097606?w=1200&q=85');
+    animation-delay: 0s;
+  }
+  &.s2 {
+    background-image: url('https://images.unsplash.com/photo-1464305795204-6f5bbfc7ee81?w=1200&q=85');
+    animation-delay: 5s;
+  }
+  &.s3 {
+    background-image: url('https://images.unsplash.com/photo-1572027632283-1b9349e7dd3b?w=1200&q=85');
+    animation-delay: 10s;
+  }
+}
+
+@keyframes authSlide {
+  0%, 33% { opacity: 1; transform: scale(1); }
+  36%, 100% { opacity: 0; transform: scale(1.05); }
+}
+
+.visual-content {
+  position: relative;
+  z-index: 1;
+  padding: 3rem;
+  background: linear-gradient(180deg, transparent, rgba(10, 6, 18, 0.9));
+
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: 2.5rem;
+    background: var(--luna-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p {
+    margin: 0;
+    color: var(--luna-text-muted);
+    font-size: 1.1rem;
+  }
+}
+
+.auth-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--luna-bg-soft);
+}
+
+.auth-card {
   width: 100%;
   max-width: 420px;
 }
@@ -15,7 +83,21 @@ mat-card {
   margin-bottom: 0.5rem;
 }
 
-button[type='submit'] {
+.submit-btn {
   width: 100%;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  height: 48px !important;
+  border-radius: 999px !important;
+  background: var(--luna-gradient) !important;
+  font-weight: 600 !important;
+}
+
+@media (max-width: 768px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-visual {
+    min-height: 200px;
+  }
 }

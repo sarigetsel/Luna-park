@@ -1,70 +1,65 @@
-<div class="page">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>My Orders</mat-card-title>
-      <mat-card-subtitle>Your ticket purchase history</mat-card-subtitle>
-    </mat-card-header>
+<div class="luna-page orders-page">
+  <header class="luna-page-header">
+    <h1>ההזמנות שלי</h1>
+    <p>היסטוריית כרטיסים והזמנות</p>
+  </header>
 
+  <mat-card>
     <mat-card-content>
       @if (loading()) {
         <div class="loading">
           <mat-spinner diameter="40"></mat-spinner>
         </div>
       } @else if (orders().length === 0) {
-        <p class="empty">No orders yet. <a routerLink="/book">Book your first ticket</a>.</p>
+        <div class="empty">
+          <p>אין הזמנות עדיין.</p>
+          <a mat-flat-button class="book-link" routerLink="/book">הזמינו כרטיס ראשון</a>
+        </div>
       } @else {
-        <table mat-table [dataSource]="orders()" class="orders-table">
-          <ng-container matColumnDef="chosenDate">
-            <th mat-header-cell *matHeaderCellDef>Visit Date</th>
-            <td mat-cell *matCellDef="let o">{{ o.chosenDate | date: 'mediumDate' }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="ticketType">
-            <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let o">
-              {{ o.ticketType === 'full_day' ? 'Full Day' : o.hoursAmount + ' hrs' }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="ride">
-            <th mat-header-cell *matHeaderCellDef>Ride</th>
-            <td mat-cell *matCellDef="let o">{{ rideName(o.rideId) }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="coupon">
-            <th mat-header-cell *matHeaderCellDef>Coupon</th>
-            <td mat-cell *matCellDef="let o">{{ o.couponCode || '—' }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="totalPrice">
-            <th mat-header-cell *matHeaderCellDef>Base</th>
-            <td mat-cell *matCellDef="let o">${{ o.totalPrice }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="discount">
-            <th mat-header-cell *matHeaderCellDef>Discount</th>
-            <td mat-cell *matCellDef="let o">
-              @if (o.discountApplied > 0) {
-                -${{ o.discountApplied }}
-              } @else {
-                —
-              }
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="finalPrice">
-            <th mat-header-cell *matHeaderCellDef>Final</th>
-            <td mat-cell *matCellDef="let o"><strong>${{ o.finalPrice }}</strong></td>
-          </ng-container>
-
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let o">{{ o.status }}</td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+        <div class="table-wrap">
+          <table mat-table [dataSource]="orders()" class="orders-table">
+            <ng-container matColumnDef="chosenDate">
+              <th mat-header-cell *matHeaderCellDef>תאריך ביקור</th>
+              <td mat-cell *matCellDef="let o">{{ o.chosenDate | date: 'dd/MM/yyyy' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="ticketType">
+              <th mat-header-cell *matHeaderCellDef>סוג</th>
+              <td mat-cell *matCellDef="let o">
+                {{ o.ticketType === 'full_day' ? 'יום שלם' : o.hoursAmount + ' שעות' }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="ride">
+              <th mat-header-cell *matHeaderCellDef>מתקן</th>
+              <td mat-cell *matCellDef="let o">{{ rideName(o.rideId) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="coupon">
+              <th mat-header-cell *matHeaderCellDef>קופון</th>
+              <td mat-cell *matCellDef="let o">{{ o.couponCode || '—' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="totalPrice">
+              <th mat-header-cell *matHeaderCellDef>בסיס</th>
+              <td mat-cell *matCellDef="let o">${{ o.totalPrice }}</td>
+            </ng-container>
+            <ng-container matColumnDef="discount">
+              <th mat-header-cell *matHeaderCellDef>הנחה</th>
+              <td mat-cell *matCellDef="let o">
+                @if (o.discountApplied > 0) { -${{ o.discountApplied }} } @else { — }
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="finalPrice">
+              <th mat-header-cell *matHeaderCellDef>סה״כ</th>
+              <td mat-cell *matCellDef="let o"><strong class="price">${{ o.finalPrice }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>סטטוס</th>
+              <td mat-cell *matCellDef="let o">
+                <span class="status-badge">{{ o.status }}</span>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
       }
     </mat-card-content>
   </mat-card>

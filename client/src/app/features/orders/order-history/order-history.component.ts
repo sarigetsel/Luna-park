@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -13,6 +14,7 @@ import { Order, RideRef } from '../../../core/models/order.model';
   imports: [
     DatePipe,
     RouterLink,
+    MatButtonModule,
     MatCardModule,
     MatTableModule,
     MatProgressSpinnerModule,
