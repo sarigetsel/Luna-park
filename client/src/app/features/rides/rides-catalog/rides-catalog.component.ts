@@ -10,7 +10,11 @@ import { Ride } from '../../../core/models/ride.model';
 import { RideService } from '../../../core/services/ride.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
-import { getDefaultParkImage } from '../../../core/constants/park-gallery';
+import {
+  getDefaultParkImage,
+  getLocalParkImages,
+  getRidePublicImage,
+} from '../../../core/constants/park-gallery';
 import { environment } from '../../../../environments/environment';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -44,19 +48,38 @@ export class RidesCatalogComponent implements OnInit {
   protected readonly rides = signal<Ride[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
+  private readonly localGalleryImages = getLocalParkImages();
+  protected readonly fallbackRideImage = this.localGalleryImages[0] || getDefaultParkImage();
 
   protected categoryLabel(category?: string): string {
     return category ? (CATEGORY_LABELS[category] ?? category) : '—';
   }
 
   protected mediaUrl(path?: string): string {
-    if (!path) {
-      return getDefaultParkImage();
+    if (!path || path.startsWith('/uploads/images/')) {
+      return getRidePublicImage();
     }
     if (path.startsWith('http')) {
       return path;
     }
     return `${environment.uploadsUrl}${path}`;
+  }
+
+  protected rideImage(ride: Ride): string {
+    if (!ride.imageUrl || ride.imageUrl.startsWith('/uploads/images/')) {
+      return getRidePublicImage(ride.name);
+    }
+    return this.mediaUrl(ride.imageUrl);
+  }
+
+  protected onRideImageError(event: Event): void {
+    const img = event.target as HTMLImageElement | null;
+    if (!img) return;
+    const current = img.src;
+    const next = this.localGalleryImages.find((url) => url !== current) || this.fallbackRideImage;
+    if (current !== next) {
+      img.src = next;
+    }
   }
 
   ngOnInit(): void {

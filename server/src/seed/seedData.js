@@ -7,9 +7,9 @@ const { adminName, adminEmail, adminPassword, uploadDir } = require('../config/e
 const { downloadImage } = require('./downloadMedia');
 
 /** Bump when ride image sources change — triggers re-download on next server start. */
-const IMAGE_SEED_VERSION = 3;
+const IMAGE_SEED_VERSION = 6;
 
-/** Real Luna Park Tel Aviv photos from Wikimedia Commons (CC-licensed). */
+/** Ride photos sourced from Unsplash. */
 const rideSeeds = [
   {
     name: 'גלגל הענק לונה',
@@ -20,7 +20,7 @@ const rideSeeds = [
     price: 30,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/%D7%94%D7%92%D7%9C%D7%92%D7%9C_%D7%94%D7%A2%D7%A0%D7%A7_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%94%D7%92%D7%9C%D7%92%D7%9C_%D7%94%D7%A2%D7%A0%D7%A7_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1520463246322-5f6c5a6fbc62?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'ferris-wheel.jpg',
   },
   {
@@ -32,7 +32,7 @@ const rideSeeds = [
     price: 45,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Anakondacoaster.JPG/960px-Anakondacoaster.JPG',
+      'https://images.unsplash.com/photo-1530866495561-507c9faab2ed?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'roller-coaster.jpg',
   },
   {
@@ -44,7 +44,7 @@ const rideSeeds = [
     price: 20,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%90.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%90.JPG',
+      'https://images.unsplash.com/photo-1532960405005-a1e4df4f6f7b?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'carousel.jpg',
   },
   {
@@ -56,7 +56,7 @@ const rideSeeds = [
     price: 35,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/%D7%94%D7%9E%D7%AA%D7%A7%D7%A0%D7%99%D7%9D_%D7%94%D7%97%D7%93%D7%A9%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7.jpg/960px-%D7%94%D7%9E%D7%AA%D7%A7%D7%A0%D7%99%D7%9D_%D7%94%D7%97%D7%93%D7%A9%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7.jpg',
+      'https://images.unsplash.com/photo-1527092719929-bf2a7b8a50a1?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'water-slide.jpg',
   },
   {
@@ -68,7 +68,7 @@ const rideSeeds = [
     price: 40,
     status: 'maintenance',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%A9%D7%93%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%A9%D7%93%D7%99%D7%9D_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'haunted-house.jpg',
   },
   {
@@ -80,7 +80,7 @@ const rideSeeds = [
     price: 15,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Luna_Park_Tel_Aviv_at_night.jpg/960px-Luna_Park_Tel_Aviv_at_night.jpg',
+      'https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'light-show.jpg',
   },
   {
@@ -92,7 +92,7 @@ const rideSeeds = [
     price: 28,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%904.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%904.JPG',
+      'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'bumper-cars.jpg',
   },
   {
@@ -104,7 +104,7 @@ const rideSeeds = [
     price: 32,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%905.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%905.JPG',
+      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'pirate-ship.jpg',
   },
   {
@@ -116,7 +116,7 @@ const rideSeeds = [
     price: 22,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%98%D7%90_%D7%92%D7%90_%D7%93%D7%90_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%98%D7%90_%D7%92%D7%90_%D7%93%D7%90_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1470104240373-bc1812eddc9f?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'teacups.jpg',
   },
   {
@@ -128,7 +128,7 @@ const rideSeeds = [
     price: 42,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%9C%D7%90%D7%A7_%D7%9E%D7%9E%D7%91%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%9C%D7%90%D7%A7_%D7%9E%D7%9E%D7%91%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1468436139062-f60a71c5c892?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'drop-tower.jpg',
   },
   {
@@ -140,7 +140,7 @@ const rideSeeds = [
     price: 30,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%94%D7%A8%D7%99%D7%9D_%D7%94%D7%9E%D7%A9%D7%A4%D7%97%D7%AA%D7%99%D7%AA_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%94%D7%A8%D7%99%D7%9D_%D7%94%D7%9E%D7%A9%D7%A4%D7%97%D7%AA%D7%99%D7%AA_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'lazy-river.jpg',
   },
   {
@@ -152,7 +152,7 @@ const rideSeeds = [
     price: 38,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%907.JPG/960px-%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%907.JPG',
+      'https://images.unsplash.com/photo-1518012312832-96aea3c91144?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'wave-pool.jpg',
   },
   {
@@ -164,7 +164,7 @@ const rideSeeds = [
     price: 36,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%A8%D7%99%D7%99%D7%A7%D7%93%D7%90%D7%A0%D7%A1%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%91%D7%A8%D7%99%D7%99%D7%A7%D7%93%D7%90%D7%A0%D7%A1%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1547744152-14d985cb937f?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'go-kart.jpg',
   },
   {
@@ -176,7 +176,7 @@ const rideSeeds = [
     price: 18,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/%D7%90%D7%99%D7%96%D7%95%D7%A8_%D7%A2%D7%95%D7%9C%D7%9D_%D7%90%D7%91%D7%A0%D7%99_%D7%94%D7%97%D7%9F_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%90%D7%99%D7%96%D7%95%D7%A8_%D7%A2%D7%95%D7%9C%D7%9D_%D7%90%D7%91%D7%A0%D7%99_%D7%94%D7%97%D7%9F_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'ball-pit.jpg',
   },
   {
@@ -188,7 +188,7 @@ const rideSeeds = [
     price: 34,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%99%D7%A0%D7%9E%D7%94_%D7%9C%D7%95%D7%A0%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%99%D7%A0%D7%9E%D7%94_%D7%9C%D7%95%D7%A0%D7%94_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'space-ride.jpg',
   },
   {
@@ -200,7 +200,7 @@ const rideSeeds = [
     price: 25,
     status: 'active',
     imageSource:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%98%D7%90%D7%A8_%D7%A4%D7%9C%D7%99%D7%99%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg/960px-%D7%9E%D7%AA%D7%A7%D7%9F_%D7%A1%D7%98%D7%90%D7%A8_%D7%A4%D7%9C%D7%99%D7%99%D7%A8_%D7%91%D7%9C%D7%95%D7%A0%D7%94_%D7%A4%D7%90%D7%A8%D7%A7_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91.jpg',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80',
     imageFile: 'glass-bridge.jpg',
   },
 ];
@@ -215,13 +215,44 @@ function copyFallbackImage(imagesDir, destFile, fallbackFile) {
   return true;
 }
 
+function ensureLocalPlaceholderImage(imagesDir) {
+  const placeholderPath = path.join(imagesDir, 'ride-placeholder.jpg');
+  if (fs.existsSync(placeholderPath) && fs.statSync(placeholderPath).size > 0) {
+    return 'ride-placeholder.jpg';
+  }
+
+  const candidateFallbacks = [
+    'coupon-luna10.jpg',
+    'coupon-summer20.jpg',
+    'coupon-family15.jpg',
+    'coupon-vip25.jpg',
+  ];
+  for (const file of candidateFallbacks) {
+    const source = path.join(imagesDir, file);
+    if (fs.existsSync(source) && fs.statSync(source).size > 0) {
+      fs.copyFileSync(source, placeholderPath);
+      return 'ride-placeholder.jpg';
+    }
+  }
+
+  // 1x1 PNG fallback (written with .jpg name is still browser-compatible image content).
+  const tinyPngBase64 =
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9fJ5gAAAAASUVORK5CYII=';
+  fs.writeFileSync(placeholderPath, Buffer.from(tinyPngBase64, 'base64'));
+  return 'ride-placeholder.jpg';
+}
+
 async function resolveRideImage(seed, imagesDir) {
   const dest = path.join(imagesDir, seed.imageFile);
   if (!fs.existsSync(dest)) {
     try {
       return await downloadImage(seed.imageSource, seed.imageFile);
     } catch (err) {
-      const copied = copyFallbackImage(imagesDir, seed.imageFile, 'ferris-wheel.jpg');
+      let copied = copyFallbackImage(imagesDir, seed.imageFile, 'ferris-wheel.jpg');
+      if (!copied) {
+        const placeholderFile = ensureLocalPlaceholderImage(imagesDir);
+        copied = copyFallbackImage(imagesDir, seed.imageFile, placeholderFile);
+      }
       if (copied) {
         console.warn(`Used fallback image for ${seed.name}`);
         return `/uploads/images/${seed.imageFile}`;
@@ -244,6 +275,17 @@ function getStoredImageVersion(imagesDir) {
 function markImageVersion(imagesDir) {
   const versionFile = path.join(imagesDir, '.ride-images-version');
   fs.writeFileSync(versionFile, String(IMAGE_SEED_VERSION));
+}
+
+async function enforceLocalRideImageUrls(imagesDir) {
+  for (const seed of rideSeeds) {
+    const imagePath = path.join(imagesDir, seed.imageFile);
+    if (!fs.existsSync(imagePath) || fs.statSync(imagePath).size === 0) {
+      continue;
+    }
+    const localUrl = `/uploads/images/${seed.imageFile}?v=${IMAGE_SEED_VERSION}`;
+    await Ride.updateOne({ name: seed.name }, { $set: { imageUrl: localUrl } });
+  }
 }
 
 async function backfillRideImages() {
@@ -289,6 +331,8 @@ async function backfillRideImages() {
   if (forceRefresh && refreshFailures === 0) {
     markImageVersion(imagesDir);
   }
+
+  await enforceLocalRideImageUrls(imagesDir);
 }
 
 async function dedupeRides() {

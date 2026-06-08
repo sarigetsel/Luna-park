@@ -98,7 +98,7 @@
         @for (ride of featuredRides(); track ride._id) {
           <mat-card class="featured-card">
             <div class="featured-img">
-              <img [src]="mediaUrl(ride.imageUrl)" [alt]="ride.name" loading="lazy" />
+              <img [src]="rideImage(ride)" [alt]="ride.name" [title]="ride.name" loading="lazy" />
               <span class="featured-price">₪{{ ride.price }}</span>
             </div>
             <mat-card-header>

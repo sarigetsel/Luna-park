@@ -15,7 +15,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CLIENT_ORIGINS
-        value: https://sarigetsel.github.io,http://localhost:4200
+        value: https://sarigetsel.github.io,https://avigailrapa.github.io,http://localhost:4200,http://localhost:4300
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD

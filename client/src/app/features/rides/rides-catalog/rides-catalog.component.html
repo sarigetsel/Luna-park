@@ -35,7 +35,13 @@
       @for (ride of rides(); track ride._id) {
         <mat-card class="ride-card" [class.maintenance]="ride.status === 'maintenance'">
           <div class="image-wrap">
-            <img [src]="mediaUrl(ride.imageUrl)" [alt]="ride.name" loading="lazy" />
+            <img
+              [src]="rideImage(ride)"
+              [alt]="ride.name"
+              [title]="ride.name"
+              loading="lazy"
+              (error)="onRideImageError($event)"
+            />
             <span class="badge category-badge">{{ categoryLabel(ride.category) }}</span>
             @if (ride.status === 'maintenance') {
               <span class="badge maintenance-badge">בתחזוקה</span>
