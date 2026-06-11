@@ -7,7 +7,12 @@ import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../core/services/auth.service';
 import { RideService } from '../../core/services/ride.service';
 import { Ride } from '../../core/models/ride.model';
-import { getDefaultParkImage, getHeroSlides, HeroSlide } from '../../core/constants/park-gallery';
+import {
+  getDefaultParkImage,
+  getHeroSlides,
+  getRidePublicImage,
+  HeroSlide,
+} from '../../core/constants/park-gallery';
 import { environment } from '../../../environments/environment';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -42,6 +47,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!path) return getDefaultParkImage();
     if (path.startsWith('http')) return path;
     return `${environment.uploadsUrl}${path}`;
+  }
+
+  protected rideImage(ride: Ride): string {
+    if (!ride.imageUrl || ride.imageUrl.startsWith('/uploads/images/')) {
+      return getRidePublicImage(ride.name);
+    }
+    return this.mediaUrl(ride.imageUrl);
   }
 
   ngOnInit(): void {
