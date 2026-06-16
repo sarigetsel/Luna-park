@@ -7,11 +7,9 @@ export function normalize(text: string): string {
     .replace(/\s+/g, ' ');
 }
 
-export async function findRideByName(rideName: string): Promise<IRide | null> {
+function matchRideInList(rides: IRide[], rideName: string): IRide | null {
   const query = normalize(rideName);
   if (!query) return null;
-
-  const rides = await Ride.find({ status: 'active' }).sort({ name: 1 });
 
   let match = rides.find((ride) => normalize(ride.name) === query);
   if (match) return match;
@@ -34,7 +32,19 @@ export async function findRideByName(rideName: string): Promise<IRide | null> {
   return null;
 }
 
-export async function suggestRideNames(limit = 5): Promise<string[]> {
-  const rides = await Ride.find({ status: 'active' }).select('name').sort({ name: 1 }).limit(limit);
+export async function findRideByName(rideName: string): Promise<IRide | null> {
+  const rides = await Ride.find({ status: 'active' }).sort({ name: 1 });
+  return matchRideInList(rides, rideName);
+}
+
+/** Admin CRUD — matches active and maintenance rides */
+export async function findRideByNameAny(rideName: string): Promise<IRide | null> {
+  const rides = await Ride.find({}).sort({ name: 1 });
+  return matchRideInList(rides, rideName);
+}
+
+export async function suggestRideNames(limit = 5, allStatuses = false): Promise<string[]> {
+  const filter = allStatuses ? {} : { status: 'active' as const };
+  const rides = await Ride.find(filter).select('name').sort({ name: 1 }).limit(limit);
   return rides.map((ride) => ride.name);
 }

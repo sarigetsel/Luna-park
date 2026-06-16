@@ -26,3 +26,5 @@ export const clientOrigins = (process.env.CLIENT_ORIGINS || 'http://localhost:42
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+export const geminiApiKey = (process.env.GEMINI_API_KEY || '').trim();
+export const geminiModel = (process.env.GEMINI_MODEL || 'gemini-2.0-flash').trim();

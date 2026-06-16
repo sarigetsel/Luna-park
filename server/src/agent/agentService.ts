@@ -1,10 +1,12 @@
 import { Request } from 'express';
-import Ride from '../models/Ride';
+import Ride, { type IRide } from '../models/Ride';
+import Coupon from '../models/Coupon';
 import { isShabbatOrHoliday } from '../middleware/shabbat';
-import { findRideByName, suggestRideNames } from './rideMatcher';
+import { findRideByName, findRideByNameAny, suggestRideNames } from './rideMatcher';
 import { runHandler, type ExpressHandler } from './runHandler';
-import type { IRide } from '../models/Ride';
 import { getToolById, getToolsForRole, getUserRole } from './tools';
+import { geminiApiKey } from '../config/env';
+import { runGeminiAgent } from './geminiAgent';
 import { parseMessage } from './intentParser';
 import type { Intent } from './intentParser';
 import * as authController from '../controllers/authController';
@@ -19,7 +21,7 @@ interface ToolResult {
   clientAction?: Record<string, unknown>;
 }
 
-interface FormattedResult {
+export interface FormattedResult {
   success: boolean;
   message: string;
   status?: number;
@@ -54,6 +56,49 @@ function buildReq(user: AuthUser | null, params: Record<string, unknown> = {}, b
 
 async function executeHealth(): Promise<ToolResult> {
   return { status: 200, data: { status: 'ok', service: 'luna-park-api' } };
+}
+
+const RIDE_UPDATE_FIELDS = [
+  'name',
+  'price',
+  'description',
+  'category',
+  'capacity',
+  'minimumHeight',
+  'status',
+  'imageUrl',
+] as const;
+
+function buildRideUpdatePayload(params: Record<string, unknown>): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+  for (const key of RIDE_UPDATE_FIELDS) {
+    if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+      payload[key] = key === 'price' || key === 'capacity' || key === 'minimumHeight'
+        ? Number(params[key])
+        : params[key];
+    }
+  }
+  return payload;
+}
+
+async function resolveRideForAdmin(params: Record<string, unknown>): Promise<IRide | null> {
+  if (params.id) {
+    return Ride.findById(String(params.id));
+  }
+  if (params.rideName) {
+    return findRideByNameAny(String(params.rideName));
+  }
+  return null;
+}
+
+async function resolveCouponForAdmin(params: Record<string, unknown>) {
+  if (params.id) {
+    return Coupon.findById(String(params.id));
+  }
+  if (params.code) {
+    return Coupon.findOne({ code: String(params.code).trim().toUpperCase() });
+  }
+  return null;
 }
 
 export async function executeTool(
@@ -125,6 +170,22 @@ export async function executeTool(
     };
   }
 
+  if (toolId === 'cart_show') {
+    return {
+      status: 200,
+      data: {},
+      clientAction: { type: 'cart_show' },
+    };
+  }
+
+  if (toolId === 'cart_clear') {
+    return {
+      status: 200,
+      data: { cleared: true },
+      clientAction: { type: 'cart_clear' },
+    };
+  }
+
   if (['POST', 'PUT', 'DELETE'].includes(tool.method)) {
     const blocked = await isShabbatOrHoliday();
     if (blocked) {
@@ -166,11 +227,7 @@ export async function executeTool(
     validate_coupon: couponController.validateCouponCode,
     list_coupons: couponController.getCoupons,
     create_coupon: couponController.createCoupon,
-    update_coupon: couponController.updateCoupon,
-    delete_coupon: couponController.deleteCoupon,
     create_ride: rideController.createRide,
-    update_ride: rideController.updateRide,
-    delete_ride: rideController.deleteRide,
   };
 
   if (toolId === 'create_ride' && !req.files) {
@@ -187,16 +244,78 @@ export async function executeTool(
     return { status: 201, data: { ride, message: 'המתקן נוצר בהצלחה' } };
   }
 
-  if (toolId === 'update_ride' && params.id) {
-    const payload = { ...params };
-    delete payload.id;
-    const ride = await Ride.findByIdAndUpdate(params.id, payload, { new: true, runValidators: true });
-    if (!ride) return { status: 404, data: { message: 'המתקן לא נמצא' } };
-    return { status: 200, data: { ride, message: 'המתקן עודכן' } };
+  if (toolId === 'update_ride') {
+    const ride = await resolveRideForAdmin(params);
+    if (!ride) {
+      const suggestions = await suggestRideNames(6, true);
+      return {
+        status: 404,
+        data: {
+          message: `לא מצאתי מתקן${params.rideName ? ` בשם "${params.rideName}"` : ''}.\nאולי התכוונת ל: ${suggestions.join(', ')}`,
+        },
+      };
+    }
+    const payload = buildRideUpdatePayload(params);
+    if (!Object.keys(payload).length) {
+      return {
+        status: 400,
+        data: { message: 'לא צוינו שדות לעדכון (למשל price, name, status, description)' },
+      };
+    }
+    const updated = await Ride.findByIdAndUpdate(ride._id, payload, { new: true, runValidators: true });
+    if (!updated) return { status: 404, data: { message: 'המתקן לא נמצא' } };
+    return {
+      status: 200,
+      data: {
+        ride: updated,
+        message: `עודכן "${updated.name}" — מחיר ₪${updated.price}`,
+      },
+    };
   }
 
-  if (toolId === 'get_ride' && params.id) {
-    req.params.id = String(params.id);
+  if (toolId === 'delete_ride') {
+    const ride = await resolveRideForAdmin(params);
+    if (!ride) {
+      return { status: 404, data: { message: `לא מצאתי מתקן${params.rideName ? ` בשם "${params.rideName}"` : ''}` } };
+    }
+    await Ride.findByIdAndDelete(ride._id);
+    return { status: 200, data: { message: `המתקן "${ride.name}" נמחק`, rideName: ride.name } };
+  }
+
+  if (toolId === 'get_ride') {
+    const ride = params.id
+      ? await Ride.findById(String(params.id))
+      : params.rideName
+        ? await findRideByNameAny(String(params.rideName))
+        : null;
+    if (!ride) {
+      return { status: 404, data: { message: 'המתקן לא נמצא' } };
+    }
+    return { status: 200, data: { ride } };
+  }
+
+  if (toolId === 'update_coupon') {
+    const coupon = await resolveCouponForAdmin(params);
+    if (!coupon) {
+      return { status: 404, data: { message: 'הקופון לא נמצא' } };
+    }
+    const payload = { ...params };
+    delete payload.id;
+    delete payload.code;
+    if (payload.discountPercent !== undefined) payload.discountPercent = Number(payload.discountPercent);
+    if (payload.usageLimit !== undefined) payload.usageLimit = Number(payload.usageLimit);
+    const updated = await Coupon.findByIdAndUpdate(coupon._id, payload, { new: true, runValidators: true });
+    if (!updated) return { status: 404, data: { message: 'הקופון לא נמצא' } };
+    return { status: 200, data: { coupon: updated, message: `הקופון ${updated.code} עודכן` } };
+  }
+
+  if (toolId === 'delete_coupon') {
+    const coupon = await resolveCouponForAdmin(params);
+    if (!coupon) {
+      return { status: 404, data: { message: 'הקופון לא נמצא' } };
+    }
+    await Coupon.findByIdAndDelete(coupon._id);
+    return { status: 200, data: { message: `הקופון ${coupon.code} נמחק` } };
   }
 
   const handler = handlers[toolId];
@@ -207,7 +326,7 @@ export async function executeTool(
   return runHandler(handler, req) as Promise<ToolResult>;
 }
 
-function formatToolResult(toolId: string, result: ToolResult): FormattedResult {
+export function formatToolResult(toolId: string, result: ToolResult): FormattedResult {
   const { status, data, clientAction } = result;
 
   if (status >= 400) {
@@ -311,6 +430,85 @@ function formatToolResult(toolId: string, result: ToolResult): FormattedResult {
     };
   }
 
+  if (toolId === 'cart_show') {
+    return {
+      success: true,
+      message: 'מבצע פעולה מקומית...',
+      status,
+      data,
+      clientAction: result.clientAction,
+    };
+  }
+
+  if (toolId === 'cart_clear') {
+    return {
+      success: true,
+      message: 'מבצע פעולה מקומית...',
+      status,
+      data,
+      clientAction: result.clientAction,
+    };
+  }
+
+  if (toolId === 'get_ride' && data?.ride) {
+    const ride = data.ride as { name: string; price: number; status: string; category: string };
+    return {
+      success: true,
+      message: `${ride.name}\nמחיר: ₪${ride.price} | סטטוס: ${ride.status} | קטגוריה: ${ride.category}`,
+      status,
+      data,
+    };
+  }
+
+  if (toolId === 'create_ride' && data?.ride) {
+    const ride = data.ride as { name: string; price: number };
+    return {
+      success: true,
+      message: (data.message as string) || `המתקן "${ride.name}" נוצר (₪${ride.price})`,
+      status,
+      data,
+    };
+  }
+
+  if (toolId === 'update_ride' && data?.ride) {
+    const ride = data.ride as { name: string; price: number };
+    return {
+      success: true,
+      message: (data.message as string) || `עודכן "${ride.name}" — ₪${ride.price}`,
+      status,
+      data,
+    };
+  }
+
+  if (toolId === 'delete_ride') {
+    return {
+      success: true,
+      message: (data?.message as string) || 'המתקן נמחק',
+      status,
+      data,
+    };
+  }
+
+  if (toolId === 'list_coupons' && data?.coupons) {
+    const coupons = data.coupons as Array<{ code: string; discountPercent: number }>;
+    const lines = coupons.slice(0, 10).map((c) => `• ${c.code} — ${c.discountPercent}%`);
+    return {
+      success: true,
+      message: `נמצאו ${coupons.length} קופונים:\n${lines.join('\n')}`,
+      status,
+      data,
+    };
+  }
+
+  if (toolId === 'create_coupon' || toolId === 'update_coupon' || toolId === 'delete_coupon') {
+    return {
+      success: true,
+      message: (data?.message as string) || 'הפעולה בוצעה בהצלחה',
+      status,
+      data,
+    };
+  }
+
   return {
     success: true,
     message: (data?.message as string) || 'הפעולה בוצעה בהצלחה',
@@ -349,7 +547,7 @@ function buildMissingMessage(intent: Extract<Intent, { type: 'missing' }>): Form
   return { success: false, message: hint, data: { partial: intent.partial || null } };
 }
 
-export async function handleChat(message: string, user: AuthUser | null): Promise<FormattedResult> {
+async function handleChatLegacy(message: string, user: AuthUser | null): Promise<FormattedResult> {
   const intent = parseMessage(message);
 
   if (intent.type === 'help') {
@@ -378,6 +576,30 @@ export async function handleChat(message: string, user: AuthUser | null): Promis
   const result = await executeTool(intent.tool, intent.params || {}, user);
   const formatted = formatToolResult(intent.tool, result);
   return { ...formatted, tool: intent.tool };
+}
+
+function isGeminiAuthError(err: unknown): boolean {
+  const text = String(err);
+  return text.includes('API_KEY_INVALID') || text.includes('API key not valid');
+}
+
+export async function handleChat(message: string, user: AuthUser | null): Promise<FormattedResult> {
+  if (geminiApiKey) {
+    try {
+      return await runGeminiAgent(message, user);
+    } catch (err) {
+      if (isGeminiAuthError(err)) {
+        console.error(
+          'Gemini API key invalid — set a valid GEMINI_API_KEY in server/.env (https://aistudio.google.com/apikey). Using legacy parser.',
+        );
+      } else {
+        console.error('Gemini agent error:', err);
+      }
+      return handleChatLegacy(message, user);
+    }
+  }
+
+  return handleChatLegacy(message, user);
 }
 
 export async function handleExecute(

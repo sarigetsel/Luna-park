@@ -260,7 +260,45 @@ export function parseMessage(message: string): Intent {
   if (/(מחק מתקן|delete ride)/.test(text)) {
     const id = extractObjectId(message);
     if (id) return { type: 'tool', tool: 'delete_ride', params: { id } };
-    return { type: 'missing', tool: 'delete_ride', missing: ['id'] };
+    const rideMatch = message.match(/(?:מחק|delete)\s+(?:את\s+)?(?:ה)?מתקן\s+(.+)/i);
+    if (rideMatch?.[1]) {
+      return { type: 'tool', tool: 'delete_ride', params: { rideName: rideMatch[1].trim() } };
+    }
+    return { type: 'missing', tool: 'delete_ride', missing: ['rideName או id'] };
+  }
+
+  if (/(שנה|עדכן|תעדכן|תשנה|update ride|change ride)/.test(text) && /(מתקן|מחיר|שקל|ride)/.test(text)) {
+    const params: Record<string, unknown> = {};
+    const rideMatch = message.match(/(?:מתקן[:\s]+|את\s+)([^:\n]+?)(?:\s+(?:ל|ב-|ב)\s*(\d+)\s*שקל|\s*$)/i);
+    if (rideMatch?.[1]) {
+      params.rideName = rideMatch[1].trim().replace(/^["']|["']$/g, '');
+    }
+    const priceMatch = message.match(/(?:ל|ב-|ב)\s*(\d+)\s*שקל/i);
+    if (priceMatch) params.price = Number(priceMatch[1]);
+    const statusMatch = text.match(/(active|maintenance|פעיל|תחזוקה)/);
+    if (statusMatch) {
+      params.status = statusMatch[1] === 'תחזוקה' || statusMatch[1] === 'maintenance' ? 'maintenance' : 'active';
+    }
+    if (!params.rideName) {
+      return { type: 'missing', tool: 'update_ride', missing: ['rideName'], partial: params };
+    }
+    if (!Object.keys(params).some((k) => k !== 'rideName')) {
+      return { type: 'missing', tool: 'update_ride', missing: ['price או שדה לעדכון'], partial: params };
+    }
+    return { type: 'tool', tool: 'update_ride', params };
+  }
+
+  if (/(צור מתקן|create ride|הוסף מתקן חדש)/.test(text)) {
+    const nameMatch = message.match(/(?:שם|name)\s+([^,]+?)(?:\s+(?:מחיר|price)|$)/i);
+    const priceMatch = message.match(/(?:מחיר|price)\s+(\d+)/i);
+    if (nameMatch && priceMatch) {
+      return {
+        type: 'tool',
+        tool: 'create_ride',
+        params: { name: nameMatch[1].trim(), price: Number(priceMatch[1]) },
+      };
+    }
+    return { type: 'missing', tool: 'create_ride', missing: ['name', 'price'] };
   }
 
   if (/(מחק קופון|delete coupon)/.test(text)) {
