@@ -1,10 +1,13 @@
 .dialog-content {
   text-align: center;
-  min-width: 300px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .barcode-img {
   max-width: 100%;
+  height: auto;
   margin: 1rem 0;
 }
 
@@ -23,4 +26,15 @@
   flex-wrap: wrap;
   gap: 0.35rem;
   padding-top: 0.5rem;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .dialog-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
 }

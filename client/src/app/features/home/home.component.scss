@@ -293,7 +293,30 @@
 
 @media (max-width: 768px) {
   .hero {
-    min-height: 520px;
+    height: min(85vh, 640px);
+    min-height: 420px;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(26, 43, 73, 0.82) 0%,
+      rgba(26, 43, 73, 0.55) 60%,
+      rgba(26, 43, 73, 0.35) 100%
+    );
+  }
+
+  .hero-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+
+    .hero-btn {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   .hero-stats {
@@ -302,5 +325,60 @@
 
   .stat strong {
     font-size: 1.25rem;
+  }
+
+  .perks {
+    padding: 2.5rem 0.875rem;
+  }
+
+  .perks h2,
+  .featured-header h2,
+  .bottom-cta-inner h2 {
+    font-size: 1.375rem;
+  }
+
+  .featured {
+    padding-inline: 0.875rem;
+  }
+
+  .featured-header {
+    flex-direction: column;
+    align-items: stretch;
+
+    a[mat-stroked-button] {
+      width: 100%;
+    }
+  }
+
+  .featured-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-cta {
+    padding: 2.25rem 0;
+  }
+
+  .bottom-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    a {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .cta-wide {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero {
+    min-height: 380px;
+  }
+
+  .perk-grid {
+    grid-template-columns: 1fr;
   }
 }

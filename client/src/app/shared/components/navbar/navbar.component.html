@@ -1,40 +1,96 @@
 <mat-toolbar class="navbar gyg-navbar">
-  <a routerLink="/" class="brand">
+  <a routerLink="/" class="brand" (click)="closeMenu()">
     <mat-icon class="brand-icon">attractions</mat-icon>
-    לונה פארק
+    <span class="brand-text">לונה פארק</span>
   </a>
+
   <span class="spacer"></span>
 
-  <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-    בית
-  </a>
-  <a mat-button routerLink="/rides" routerLinkActive="active">מתקנים</a>
-
-  @if (auth.isCustomer()) {
-    <a mat-button routerLink="/book" routerLinkActive="active">הזמנת כרטיס</a>
-    <a
-      mat-button
-      routerLink="/cart-checkout"
-      routerLinkActive="active"
-      [matBadge]="cart.count()"
-      matBadgeColor="accent"
-      [matBadgeHidden]="cart.count() === 0"
-    >
-      <mat-icon>shopping_cart</mat-icon>
-      סל
+  <nav class="nav-desktop" aria-label="ניווט ראשי">
+    <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      בית
     </a>
-    <a mat-button routerLink="/my-orders" routerLinkActive="active">ההזמנות שלי</a>
-  }
+    <a mat-button routerLink="/rides" routerLinkActive="active">מתקנים</a>
 
-  @if (auth.isAdmin()) {
-    <a mat-button routerLink="/admin" routerLinkActive="active">ניהול</a>
-  }
+    @if (auth.isCustomer()) {
+      <a mat-button routerLink="/book" routerLinkActive="active">הזמנת כרטיס</a>
+      <a
+        mat-button
+        routerLink="/cart-checkout"
+        routerLinkActive="active"
+        [matBadge]="cart.count()"
+        matBadgeColor="accent"
+        [matBadgeHidden]="cart.count() === 0"
+      >
+        <mat-icon>shopping_cart</mat-icon>
+        סל
+      </a>
+      <a mat-button routerLink="/my-orders" routerLinkActive="active">ההזמנות שלי</a>
+    }
 
-  @if (auth.isAuthenticated()) {
-    <span class="user-label">{{ auth.user()?.name }}</span>
-    <button mat-stroked-button type="button" (click)="auth.logout()">התנתקות</button>
-  } @else {
-    <a mat-button routerLink="/login" routerLinkActive="active">התחברות</a>
-    <a mat-flat-button color="primary" routerLink="/register" routerLinkActive="active">הרשמה</a>
-  }
+    @if (auth.isAdmin()) {
+      <a mat-button routerLink="/admin" routerLinkActive="active">ניהול</a>
+    }
+
+    @if (auth.isAuthenticated()) {
+      <span class="user-label">{{ auth.user()?.name }}</span>
+      <button mat-stroked-button type="button" (click)="auth.logout()">התנתקות</button>
+    } @else {
+      <a mat-button routerLink="/login" routerLinkActive="active">התחברות</a>
+      <a mat-flat-button color="primary" routerLink="/register" routerLinkActive="active">הרשמה</a>
+    }
+  </nav>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="menu-toggle"
+    (click)="toggleMenu()"
+    [attr.aria-expanded]="menuOpen()"
+    aria-controls="mobile-nav"
+    aria-label="תפריט ניווט"
+  >
+    <mat-icon>{{ menuOpen() ? 'close' : 'menu' }}</mat-icon>
+  </button>
 </mat-toolbar>
+
+@if (menuOpen()) {
+  <div class="nav-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+  <nav id="mobile-nav" class="nav-mobile" aria-label="ניווט נייד">
+    <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+      בית
+    </a>
+    <a mat-button routerLink="/rides" routerLinkActive="active" (click)="closeMenu()">מתקנים</a>
+
+    @if (auth.isCustomer()) {
+      <a mat-button routerLink="/book" routerLinkActive="active" (click)="closeMenu()">הזמנת כרטיס</a>
+      <a
+        mat-button
+        routerLink="/cart-checkout"
+        routerLinkActive="active"
+        [matBadge]="cart.count()"
+        matBadgeColor="accent"
+        [matBadgeHidden]="cart.count() === 0"
+        (click)="closeMenu()"
+      >
+        <mat-icon>shopping_cart</mat-icon>
+        סל
+      </a>
+      <a mat-button routerLink="/my-orders" routerLinkActive="active" (click)="closeMenu()">ההזמנות שלי</a>
+    }
+
+    @if (auth.isAdmin()) {
+      <a mat-button routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">ניהול</a>
+    }
+
+    <div class="mobile-auth">
+      @if (auth.isAuthenticated()) {
+        <span class="user-label">{{ auth.user()?.name }}</span>
+        <button mat-stroked-button type="button" (click)="auth.logout(); closeMenu()">התנתקות</button>
+      } @else {
+        <a mat-button routerLink="/login" routerLinkActive="active" (click)="closeMenu()">התחברות</a>
+        <a mat-flat-button color="primary" routerLink="/register" routerLinkActive="active" (click)="closeMenu()">הרשמה</a>
+      }
+    </div>
+  </nav>
+}

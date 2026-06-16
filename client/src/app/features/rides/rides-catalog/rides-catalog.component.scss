@@ -244,12 +244,60 @@ mat-card-actions {
   padding-top: 0.5rem !important;
 }
 
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+  }
+
   .cta-btn {
     width: 100%;
   }
 
   .cards {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .image-wrap {
+    height: 200px;
+  }
+
+  .gyg-rating {
+    flex-wrap: wrap;
+  }
+
+  .highlights {
+    gap: 0.35rem;
+  }
+
+  .cart-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem 1rem;
+    gap: 0.65rem;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .cart-bar-info {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .page.has-cart {
+    padding-bottom: 7.5rem;
   }
 }

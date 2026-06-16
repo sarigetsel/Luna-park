@@ -1,7 +1,7 @@
 .page {
   max-width: 960px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: clamp(1rem, 3vw, 2rem) clamp(0.875rem, 3vw, 1rem);
 }
 
 .loading {
@@ -16,6 +16,20 @@
   color: #666;
 }
 
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
+}
+
 .orders-table {
   width: 100%;
+  min-width: 720px;
+}
+
+@media (max-width: 768px) {
+  .orders-table {
+    min-width: 640px;
+  }
 }

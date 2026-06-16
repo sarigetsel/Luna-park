@@ -1,7 +1,7 @@
 .page {
   max-width: 960px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: clamp(1rem, 3vw, 2rem) clamp(0.875rem, 3vw, 1rem);
 }
 
 .page-header {
@@ -27,6 +27,26 @@
 @media (max-width: 768px) {
   .checkout-grid {
     grid-template-columns: 1fr;
+  }
+
+  .page-header a[mat-stroked-button] {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .card-row {
+    grid-template-columns: 1fr;
+  }
+
+  .items-list li {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .item-name {
+    flex: 1 1 100%;
   }
 }
 
