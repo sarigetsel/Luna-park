@@ -5,9 +5,8 @@ Hebrew UI (RTL), modern booking-platform-inspired design, Angular 21 on the clie
 
 **Luna-park** is a full-stack amusement park ticketing and management system — Hebrew UI, image-rich catalog, cart checkout, barcode confirmations, AI assistant, and admin tools.
 
-
-
 ![Luna Park Homepage Banner](https://github.com/user-attachments/assets/7e2c0a5c-598a-4e66-9aca-221b059a0339)
+
 
 ## Project overview
 
