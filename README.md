@@ -29,7 +29,7 @@ Visitors can browse a home page with a carousel of real park photos, explore a c
 - Real park images (Wikimedia Commons), stored locally under `/uploads`
 
 
-![Rides Catalog](https://github.com/user-attachments/assets/06cc53bc-acc0-44be-8362-1a84fab9e112)
+![Rides Catalog](https://github.com/user-attachments/assets/1daa3f86-c94b-491f-9796-df64ada11806)
 
 ### AI agent
 
@@ -62,6 +62,7 @@ Visitors can browse a home page with a carousel of real park photos, explore a c
 
 
 ![Digital Barcode Ticket](https://github.com/user-attachments/assets/130be162-6261-430a-9428-a1a42cbd00ba)
+![Cart and coupon](https://github.com/user-attachments/assets/129df724-aba4-47d3-9867-7c5f25b01ecb)
 
 ### Rides & coupons
 
@@ -72,6 +73,7 @@ Visitors can browse a home page with a carousel of real park photos, explore a c
 
 ![Admin Dashboard](https://github.com/user-attachments/assets/14c746ca-f50a-4e12-b784-eec22e5769ad)
 ![](https://github.com/user-attachments/assets/2c83ec15-4175-4924-8655-3b72ca09483e)
+![](https://github.com/user-attachments/assets/99235b54-f394-43e8-9a62-b9df34a35b8c)
 
 ---
 
